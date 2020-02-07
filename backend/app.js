@@ -3,6 +3,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const helmet = require("helmet");
 require("dotenv").config();
 
 const userRouter = require("./routes/user");
@@ -17,6 +19,9 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors());
+app.options("*", cors());
+app.use(helmet());
 
 app.use("/user", userRouter);
 app.use("/product", productRouter);
