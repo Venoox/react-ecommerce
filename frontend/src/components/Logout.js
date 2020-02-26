@@ -1,30 +1,21 @@
-import React, { useEffect } from "react";
-import { withRouter } from "react-router-dom";
+import { backend } from "../gateway";
 
-const Logout = ({ history, isAuth, setisAuth }) => {
-	useEffect(() => {
-		fetch("http://172.22.151.216:8080/user/delete", {
-			method: "DELETE",
-			cache: "no-cache",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ token: localStorage.getItem("token") }),
+const Logout = () => {
+	backend
+		.delete("/user/logout")
+		.then(response => {
+			if (response.status === 200 && response.statusText === "OK") {
+				localStorage.removeItem("token");
+				delete backend.defaults.headers.common["Authorization"];
+			} else {
+				throw new Error("Network response was not ok");
+			}
 		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error("Network error");
-				} else {
-					setisAuth(false);
-					localStorage.removeItem("token");
-					history.push("/");
-				}
-			})
-			.catch(err => {
-				console.log(err);
-			});
-	}, []);
-	return null;
+		.catch(err => {
+			console.log(err);
+			localStorage.removeItem("token");
+			delete backend.defaults.headers.common["Authorization"];
+		});
 };
 
-export default withRouter(Logout);
+export default Logout;

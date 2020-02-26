@@ -1,72 +1,79 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import React, { useReducer } from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { NotificationContainer } from "react-notifications";
+
 import "./App.scss";
+import "react-notifications/lib/notifications.css";
 
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Home from "./components/Home";
 import Register from "./components/Register";
-import Logout from "./components/Logout";
+import NavBar from "./components/NavBar";
+import Products from "./components/Products";
+
+import Grid from "@material-ui/core/Grid";
+import Cart from "./components/Cart";
+
+export const AuthContext = React.createContext();
+
+const initialState = {
+	isAuth: false,
+	user: null,
+};
+const reducer = (state, action) => {
+	switch (action.type) {
+		case "LOGIN":
+			localStorage.setItem("token", action.payload.token);
+			return {
+				...state,
+				isAuth: true,
+				user: action.payload.user,
+			};
+		case "LOGOUT":
+			localStorage.removeItem("token");
+			return {
+				...state,
+				isAuth: false,
+				user: null,
+			};
+		default:
+			return state;
+	}
+};
 
 const App = () => {
-	const [isAuth, setisAuth] = useState(false);
-
-	useEffect(() => {
-		if (localStorage.getItem("token")) {
-			setisAuth(true);
-		} else {
-			setisAuth(false);
-		}
-	}, []);
+	const [state, dispatch] = useReducer(reducer, initialState);
 
 	return (
 		<BrowserRouter>
-			<div>
-				<nav>
-					<ul>
-						<li>
-							<Link to="/">Home</Link>
-						</li>
-						<li>
-							<Link to="/dashboard">Dashboard</Link>
-						</li>
-						{isAuth ? (
-							<li>
-								<Link to="/logout">Logout</Link>
-							</li>
-						) : (
-							<>
-								<li>
-									<Link to="/login">Login</Link>
-								</li>
-								<li>
-									<Link to="/register">Register</Link>
-								</li>
-							</>
-						)}
-					</ul>
-				</nav>
+			<AuthContext.Provider value={{ state, dispatch }}>
+				<Grid container direction="column">
+					<NavBar />
+					<Switch>
+						<Route exact path="/login">
+							<Login />
+						</Route>
+						<Route exact path="/products">
+							<Products />
+						</Route>
+						<Route exact path="/register">
+							<Register />
+						</Route>
+						<Route exact path="/dashboard">
+							<Dashboard />
+						</Route>
+						<Route exact path="/cart">
+							<Cart />
+						</Route>
+						<Route exact path="/">
+							<Home />
+						</Route>
+					</Switch>
 
-				{/* A <Switch> looks through its children <Route>s and
-          renders the first one that matches the current URL. */}
-				<Switch>
-					<Route path="/login">
-						<Login isAuth={isAuth} setisAuth={setisAuth} />
-					</Route>
-					<Route path="/register">
-						<Register isAuth={isAuth} />
-					</Route>
-					<Route path="/logout">
-						<Logout isAuth={isAuth} setisAuth={setisAuth} />
-					</Route>
-					<Route path="/dashboard">
-						<Dashboard isAuth={isAuth} />
-					</Route>
-					<Route path="/">
-						<Home isAuth={isAuth} />
-					</Route>
-				</Switch>
-			</div>
+					<NotificationContainer />
+				</Grid>
+			</AuthContext.Provider>
 		</BrowserRouter>
 	);
 };
