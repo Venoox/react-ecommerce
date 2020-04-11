@@ -1,25 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const mongooseHidden = require("mongoose-hidden")({ defaultHidden: { __v: true } });
-const mongoosePaginate = require("mongoose-paginate-v2");
 
-const productSchema = new Schema({
-	name: {
-		type: String,
+const ratingSchema = new Schema({
+	productId: {
+		type: mongoose.ObjectId,
 		required: true,
 	},
-	description: {
-		type: String,
-		required: false,
+	userId: {
+		type: mongoose.ObjectId,
+		required: true,
 	},
-	price: {
+	stars: {
 		type: Number,
 		required: true,
 	},
-	image: {
+	comment: {
 		type: String,
 		required: true,
-		default: "uploads/default.jpeg",
 	},
 	createdAt: {
 		type: Date,
@@ -28,10 +26,9 @@ const productSchema = new Schema({
 	},
 });
 
-productSchema.plugin(mongooseHidden);
-productSchema.plugin(mongoosePaginate);
+ratingSchema.plugin(mongooseHidden);
 
 module.exports = {
-	model: mongoose.model("Product", productSchema),
+	model: mongoose.model("Rating", ratingSchema),
 	schema: null,
 };

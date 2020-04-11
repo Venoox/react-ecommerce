@@ -3,6 +3,10 @@ const mongooseHidden = require("mongoose-hidden")({ defaultHidden: { __v: true }
 const Schema = mongoose.Schema;
 
 const tokenSchema = new Schema({
+	userId: {
+		type: mongoose.ObjectId,
+		required: true
+	},
 	token: {
 		type: String,
 		required: true,

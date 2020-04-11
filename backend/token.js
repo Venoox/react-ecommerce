@@ -7,7 +7,7 @@ const makeToken = async (id, type) => {
 	const token = jwt.sign({ id: id, type: type }, "secretkey");
 
 	try {
-		await Token.model.create({ token });
+		await Token.model.create({ token, userId: id });
 		return token;
 	} catch (err) {
 		debug(err);
@@ -48,5 +48,5 @@ module.exports = {
 	makeToken,
 	verifyToken,
 	invalidateToken,
-	extendToken,
+	extendToken
 };

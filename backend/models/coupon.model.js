@@ -1,25 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const mongooseHidden = require("mongoose-hidden")({ defaultHidden: { __v: true } });
-const mongoosePaginate = require("mongoose-paginate-v2");
 
-const productSchema = new Schema({
-	name: {
+const couponSchema = new Schema({
+	couponCode: {
 		type: String,
 		required: true,
 	},
-	description: {
-		type: String,
-		required: false,
-	},
-	price: {
+	discount: {
 		type: Number,
 		required: true,
 	},
-	image: {
-		type: String,
+	expireDate: {
+		type: Date,
 		required: true,
-		default: "uploads/default.jpeg",
 	},
 	createdAt: {
 		type: Date,
@@ -28,10 +22,9 @@ const productSchema = new Schema({
 	},
 });
 
-productSchema.plugin(mongooseHidden);
-productSchema.plugin(mongoosePaginate);
+couponSchema.plugin(mongooseHidden);
 
 module.exports = {
-	model: mongoose.model("Product", productSchema),
+	model: mongoose.model("Coupon", couponSchema),
 	schema: null,
 };

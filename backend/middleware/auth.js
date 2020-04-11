@@ -15,7 +15,7 @@ module.exports = type => (req, res, next) => {
 		const token = parseAuth();
 		verifyToken(token)
 			.then(decodedToken => {
-				if (type === decodedToken.type) {
+				if (type.includes(decodedToken.type)) {
 					req.token = token;
 					req.decodedToken = decodedToken;
 					extendToken(token)

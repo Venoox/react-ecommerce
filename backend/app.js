@@ -9,10 +9,13 @@ const path = require("path");
 const userRouter = require("./routes/user");
 const productRouter = require("./routes/product");
 const cartRouter = require("./routes/cart");
+const couponRouter = require("./routes/coupon");
+const ratingRouter = require("./routes/rating");
+const orderRouter = require("./routes/order");
 
 const app = express();
 
-const whitelist = ["http://172.20.6.137:3000", "http://localhost:3000"];
+const whitelist = ["http://172.30.1.59:3000", "http://localhost:3000", "http://localhost:5000"];
 const options = {
 	origin: whitelist,
 };
@@ -36,6 +39,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/cart", cartRouter);
+app.use("/coupon", couponRouter);
+app.use("/rating", ratingRouter);
+app.use("/order", orderRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

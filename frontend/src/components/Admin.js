@@ -6,8 +6,7 @@ import withAuth from "../hoc/withAuth";
 import AddProduct from "./AddProduct";
 import AddCoupon from "./AddCoupon";
 import ListItemLink from "./ListItemLink";
-import Account from "./Account";
-import Orders from "./Orders";
+import AddOrder from "./AddOrder";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -19,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const Dashboard = () => {
+const Admin = () => {
 	const { state, dispatch } = useContext(AuthContext);
 	const classes = useStyles();
 	const history = useHistory();
@@ -28,18 +27,27 @@ const Dashboard = () => {
 		<>
 			<Grid container direction="row" justify="flex-start" alignItems="flex-start">
 				<Paper className={classes.paper}>
-					<List component="nav" aria-label="secondary mailbox folders">
-						<ListItemLink primary="Account" to="/dashboard" />
-						<ListItemLink primary="Orders" to="/dashboard/orders" />
+					<List component="nav">
+						<ListItemLink primary="Home" to="/admin" />
+						<ListItemLink primary="Products" to="/admin/products" />
+						<ListItemLink primary="Orders" to="/admin/orders" />
+						<ListItemLink primary="Users" to="/admin/users" />
+						<ListItemLink primary="Coupons" to="/admin/coupons" />
 					</List>
 				</Paper>
-
 				<Switch>
-					<Route path="/dashboard/orders">
-						<Orders />
+					<Route path="/admin/products">
+						<AddProduct />
 					</Route>
-					<Route path="/dashboard">
-						<Account />
+					<Route path="/admin/users"></Route>
+					<Route path="/admin/coupons">
+						<AddCoupon />
+					</Route>
+					<Route path="/admin/orders">
+						<AddOrder />
+					</Route>
+					<Route path="/admin">
+						<div>Email: {}</div>
 					</Route>
 				</Switch>
 			</Grid>
@@ -47,4 +55,4 @@ const Dashboard = () => {
 	);
 };
 
-export default withAuth(Dashboard);
+export default Admin;

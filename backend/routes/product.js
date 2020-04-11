@@ -9,26 +9,58 @@ const storage = multer.diskStorage({
 	},
 	filename: function(req, file, cb) {
 		cb(null, file.fieldname + "-" + Date.now() + "." + file.mimetype.split("/")[1]);
-	},
+	}
 });
+
 const fileFilter = (req, file, cb) => {
 	if (file.mimetype.split("/")[0] === "image") cb(null, true);
 	else cb(null, false);
 };
+
 const limits = {
-	fileSize: 5242880,
+	fileSize: 5242880
 };
+
 const upload = multer({ storage, fileFilter, limits });
 
 const Product = require("../models/product.model");
 
-router.get("/all", async (req, res) => {
+router.get("/pages", async (req, res) => {
 	try {
-		const products = await Product.model.find({});
-		if (products) {
-			res.json(products);
+		const count = await Product.model.countDocuments({});
+		if (count) {
+			res.json({ pages: Math.ceil(count / 12) });
 		} else {
 			throw Error("Error listing products");
+		}
+	} catch (err) {
+		debug(err);
+		res.status(400).send("Error listing products");
+	}
+});
+
+router.get("/page/:page", async (req, res) => {
+	try {
+		if (req.params.page === "all") {
+			const products = await Product.model.find({});
+			if (products) {
+				res.json(products);
+			} else {
+				throw Error("Error listing products");
+			}
+		} else {
+			const products = await Product.model.paginate(
+				{},
+				{
+					page: req.params.page,
+					limit: 12
+				}
+			);
+			if (products) {
+				res.json(products.docs);
+			} else {
+				throw Error("Error listing products");
+			}
 		}
 	} catch (err) {
 		debug(err);
@@ -50,7 +82,7 @@ router.get("/:id", async (req, res) => {
 	}
 });
 
-router.post("/create", upload.single("avatar"), async (req, res) => {
+router.post("/create", upload.single("product"), async (req, res) => {
 	try {
 		debug(req.file);
 		const { name, price } = req.body;
@@ -66,6 +98,26 @@ router.post("/create", upload.single("avatar"), async (req, res) => {
 	} catch (err) {
 		debug(err);
 		res.status(400).send("Error creating product");
+	}
+});
+
+router.put("/update", upload.single("product"), async (req, res) => {
+	//const { id: userId, type } = req.decodedToken;
+	const { productId, name, price } = req.body;
+	const image = (req.file && req.file.path) || null;
+	try {
+		const result = await Product.model.findById(productId);
+		if (result) {
+			if (name) result.name = name;
+			if (price) result.price = price;
+			if (image) result.image = image;
+			const saved = await result.save();
+			if (saved) res.send("Modified product");
+			else throw Error("Error modifying product");
+		} else throw Error("Error modifying product");
+	} catch (err) {
+		debug(err);
+		res.status(400).send("Error modifying product");
 	}
 });
 

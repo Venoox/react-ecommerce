@@ -4,12 +4,12 @@ import { useHistory } from "react-router-dom";
 import { NotificationManager } from "react-notifications";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { CircularProgress, Typography, Button, TextField, Grid, Paper } from "@material-ui/core";
+import { CircularProgress, Typography, Button, TextField, Grid, Paper, FormControlLabel, Switch } from "@material-ui/core";
 
 import { backend } from "../gateway";
 import { AuthContext } from "../App";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 	},
@@ -36,8 +36,9 @@ const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [remember, setRemember] = useState(false);
 
-	const signIn = e => {
+	const signIn = (e) => {
 		e.preventDefault();
 		if (email.length < 1 || password.length < 1) {
 			NotificationManager.error("Email or password too short", "Error", 3000);
@@ -46,7 +47,7 @@ const Login = () => {
 		setLoading(true);
 		backend
 			.post("/user/login", { email, password })
-			.then(response => {
+			.then((response) => {
 				if (response.status === 200 && response.statusText === "OK") {
 					localStorage.setItem("token", response.data.token);
 					backend.defaults.headers.common["Authorization"] = "Bearer " + response.data.token;
@@ -56,7 +57,7 @@ const Login = () => {
 					throw new Error("Network response was not ok");
 				}
 			})
-			.catch(err => {
+			.catch((err) => {
 				setLoading(false);
 				NotificationManager.error("Wrong password or email", "Error", 3000);
 				console.log(err);
@@ -84,10 +85,10 @@ const Login = () => {
 						label="E-mail"
 						variant="outlined"
 						type="email"
-						onChange={e => setEmail(e.target.value)}
+						onChange={(e) => setEmail(e.target.value)}
 					/>
-					<TextField disabled={loading} id="outlined-basic" label="Password" variant="outlined" type="password" onChange={e => setPassword(e.target.value)} />
-
+					<TextField disabled={loading} id="outlined-basic" label="Password" variant="outlined" type="password" onChange={(e) => setPassword(e.target.value)} />
+					<FormControlLabel style={{ alignSelf: "flex-start" }} control={<Switch checked={remember} onChange={(e) => setRemember(e.target.checked)} />} label="Remember me" />
 					<Button disabled={loading} variant="contained" color="primary" onClick={signIn}>
 						{loading ? <CircularProgress size={20}></CircularProgress> : "Login"}
 					</Button>

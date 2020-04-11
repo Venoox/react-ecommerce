@@ -13,6 +13,41 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	type: {
+		type: String,
+		required: true,
+	},
+	firstName: {
+		type: String,
+		required: false,
+	},
+	lastName: {
+		type: String,
+		required: false,
+	},
+	address: {
+		street: {
+			type: String,
+			required: false,
+		},
+		city: {
+			type: String,
+			required: false,
+		},
+		zip: {
+			type: String,
+			required: false,
+		},
+		country: {
+			type: String,
+			required: false,
+		},
+	},
+	image: {
+		type: String,
+		required: true,
+		default: "uploads/default-avatar.png",
+	},
 	created_at: {
 		type: Date,
 		required: true,

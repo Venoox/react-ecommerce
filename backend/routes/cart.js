@@ -5,15 +5,15 @@ const auth = require("../middleware/auth");
 const Cart = require("../models/cart.model");
 const Product = require("../models/product.model");
 
-router.get("/", auth("user"), async (req, res) => {
+router.get("/", auth(["user", "admin"]), async (req, res) => {
 	const { id: userId, type } = req.decodedToken;
 	try {
 		const cart = await Cart.model.find({ userId });
 		if (cart) {
-			const promises = cart.map(product => {
+			const promises = cart.map((product) => {
 				return Product.model
 					.findById(product.productId)
-					.then(result => {
+					.then((result) => {
 						if (result) {
 							return {
 								productId: product.productId,
@@ -32,12 +32,12 @@ router.get("/", auth("user"), async (req, res) => {
 							};
 						}
 					})
-					.catch(err => {
+					.catch((err) => {
 						debug(err);
 						return Error("Error occurred");
 					});
 			});
-			Promise.all(promises).then(data => {
+			Promise.all(promises).then((data) => {
 				res.json(data);
 			});
 		} else throw Error("Cart not found");
@@ -47,7 +47,7 @@ router.get("/", auth("user"), async (req, res) => {
 	}
 });
 
-router.post("/add", auth("user"), async (req, res) => {
+router.post("/add", auth(["user", "admin"]), async (req, res) => {
 	const { id: userId, type } = req.decodedToken;
 	const { productId, quantity } = req.body;
 	try {
@@ -68,7 +68,7 @@ router.post("/add", auth("user"), async (req, res) => {
 	}
 });
 
-router.delete("/remove/:productId", auth("user"), async (req, res) => {
+router.delete("/remove/:productId", auth(["user", "admin"]), async (req, res) => {
 	const { id: userId, type } = req.decodedToken;
 	const { productId } = req.params;
 	try {
@@ -82,11 +82,11 @@ router.delete("/remove/:productId", auth("user"), async (req, res) => {
 	}
 });
 
-router.put("/change", auth("user"), async (req, res) => {
+router.put("/change", auth(["user", "admin"]), async (req, res) => {
 	const { id: userId, type } = req.decodedToken;
 	const { productId, quantity } = req.body;
 	try {
-		const result = await Cart.model.findOneAndUpdate({ userId, productId }, { $set: { quantity: quantity } });
+		const result = await Cart.model.findOneAndUpdate({ userId, productId }, { quantity });
 		if (result) res.send("Modified product in cart");
 		else throw Error("Error modifying product");
 	} catch (err) {
@@ -95,10 +95,10 @@ router.put("/change", auth("user"), async (req, res) => {
 	}
 });
 
-router.delete("/clear", auth("user"), async (req, res) => {
+router.delete("/clear", auth(["user", "admin"]), async (req, res) => {
 	const { id: userId, type } = req.decodedToken;
 	try {
-		const result = await Cart.model.remove({ userId });
+		const result = await Cart.model.deleteMany({ userId });
 		if (result) res.send("Cleared cart");
 		else throw Error("Error clearing cart");
 	} catch (err) {

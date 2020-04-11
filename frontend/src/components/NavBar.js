@@ -8,7 +8,7 @@ import Logout from "./Logout";
 import { AuthContext } from "../App";
 import { backend } from "../gateway";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 	},
@@ -42,6 +42,11 @@ const NavBar = () => {
 								<Button color="inherit" onClick={() => history.push("/cart")}>
 									Cart
 								</Button>
+								{state.user.type === "admin" ? (
+									<Button color="inherit" onClick={() => history.push("/admin")}>
+										Admin
+									</Button>
+								) : null}
 								<Button color="inherit" onClick={() => history.push("/dashboard")}>
 									Dashboard
 								</Button>
