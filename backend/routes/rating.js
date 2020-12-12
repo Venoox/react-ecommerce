@@ -9,20 +9,20 @@ const User = require("../models/user.model");
 router.get("/:productId", async (req, res) => {
 	try {
 		const ratings = await Rating.model.find({
-			productId: req.params.productId
+			productId: req.params.productId,
 		});
 		if (ratings) {
-			const promises = ratings.map(rating => {
+			const promises = ratings.map((rating) => {
 				return User.model
 					.findById(rating.userId)
-					.then(user => {
+					.then((user) => {
 						if (user) {
 							return {
 								_id: rating._id,
 								name: user.firstName + " " + user.lastName,
 								image: user.image,
 								stars: rating.stars,
-								comment: rating.comment
+								comment: rating.comment,
 							};
 						} else {
 							return {
@@ -30,16 +30,16 @@ router.get("/:productId", async (req, res) => {
 								name: "Unknown user",
 								image: "uploads/default-avatar.png",
 								stars: rating.stars,
-								comment: rating.comment
+								comment: rating.comment,
 							};
 						}
 					})
-					.catch(err => {
+					.catch((err) => {
 						debug(err);
 						return Error("Error occurred");
 					});
 			});
-			Promise.all(promises).then(data => {
+			Promise.all(promises).then((data) => {
 				console.log(data);
 				res.json(data);
 			});
@@ -56,11 +56,15 @@ router.post("/", auth(["admin", "user"]), async (req, res) => {
 	const { productId, stars, comment } = req.body;
 	try {
 		const rating = await Rating.model.create({ productId, userId: id, stars, comment });
-		if (rating) {
-			res.send("Rating created");
-		} else {
-			throw Error("Error creating rating!");
-		}
+		if (!rating) return res.status(404).send("Error");
+		const user = await User.model.findById(id);
+		res.send({
+			_id: rating._id,
+			name: user.firstName + " " + user.lastName,
+			image: user.image,
+			stars: rating.stars,
+			comment: rating.comment,
+		});
 	} catch (err) {
 		debug(err);
 		res.status(404).send("Error creating rating!");
@@ -71,13 +75,11 @@ router.put("/", auth(["admin", "user"]), async (req, res) => {
 	const { ratingId, stars, comment } = req.body;
 	try {
 		const rating = await Rating.model.findById(ratingId);
-		if (rating) {
-			rating.stars = stars || rating.stars;
-			rating.comment = comment || rating.comment;
-			const result = await rating.save();
-			if (result) res.send("Rating updated");
-			else throw Error("Error updating rating");
-		} else throw Error("Error updating rating");
+		if (!rating) return res.status(404).send("Error");
+		rating.stars = stars || rating.stars;
+		rating.comment = comment || rating.comment;
+		await rating.save();
+		res.send("Rating updated");
 	} catch (err) {
 		res.status(404).send(err);
 	}
@@ -86,13 +88,11 @@ router.put("/", auth(["admin", "user"]), async (req, res) => {
 router.delete("/:id", auth(["admin", "user"]), async (req, res) => {
 	try {
 		const rating = await Rating.model.findByIdAndRemove(req.params.id);
-		if (rating) {
-			res.send("Rating removed");
-		} else {
-			throw Error("Error removing rating!");
-		}
+		if (!rating) return res.status(404).send("Error");
+		res.send("Rating removed");
 	} catch (err) {
-		res.status(404).send(err);
+		debug(err);
+		res.status(404).send("Error");
 	}
 });
 

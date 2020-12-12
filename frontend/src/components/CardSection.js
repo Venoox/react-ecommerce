@@ -25,10 +25,10 @@ const CARD_ELEMENT_OPTIONS = {
 
 function CardSection() {
 	return (
-		<label>
-			Card details
+		<>
+			<label style={{ margin: 5 }}>Card details</label>
 			<CardElement options={CARD_ELEMENT_OPTIONS} />
-		</label>
+		</>
 	);
 }
 

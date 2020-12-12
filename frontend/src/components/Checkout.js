@@ -53,7 +53,7 @@ const Checkout = () => {
 	const [city, setCity] = useState("");
 	const [zip, setZip] = useState("");
 	const [country, setCountry] = useState("Slovenia");
-	const [payment, setPayment] = useState("");
+	const [payment, setPayment] = useState("upn");
 	const [orderId, setOrderId] = useState("");
 	const [clientSecret, setClientSecret] = useState("");
 	const steps = getSteps();
@@ -155,7 +155,16 @@ const Checkout = () => {
 				}
 			}
 		} else {
-			setActiveStep(activeStep + 1);
+			const response = await backend.put("/order/addpayment/", {
+				payment,
+				orderId,
+			});
+
+			if (response.status === 200 && response.statusText === "OK") {
+				setActiveStep(activeStep + 1);
+			} else {
+				NotificationManager.error("Failed to create order", "Error", 3000);
+			}
 		}
 	};
 
@@ -199,13 +208,13 @@ const Checkout = () => {
 					<Grid container direction="column" justify="center" alignItems="center">
 						<FormLabel component="legend">Choose payment method</FormLabel>
 						<RadioGroup aria-label="payment" value={payment} onChange={(e) => setPayment(e.target.value)}>
-							<FormControlLabel value="upn" control={<Radio />} label="UPN" checked />
+							<FormControlLabel value="upn" control={<Radio />} label="UPN" />
 							<FormControlLabel value="delivery" control={<Radio />} label="Pay on delivery" />
 							<FormControlLabel value="creditcard" control={<Radio />} label="Credit Card" />
 						</RadioGroup>
-						{payment === "credicard" ? <CardSection /> : null}
+						{payment === "creditcard" ? <CardSection /> : null}
 					</Grid>
-				) : activeStep === 2 ? (
+				) : activeStep === 3 ? (
 					<>
 						<CheckoutPreview />
 						<div>Success</div>
@@ -215,7 +224,7 @@ const Checkout = () => {
 						<div>City: {city}</div>
 						<div>ZIP: {zip}</div>
 						<div>Country: {country}</div>
-						<div>Payment method: {payment === "upn" ? "UPN" : payment === "povzetje" ? "Pay on delivery" : payment === "creditcard" ? "Credit card" : null}</div>
+						<div>Payment method: {payment === "upn" ? "UPN" : payment === "delivery" ? "Pay on delivery" : payment === "creditcard" ? "Credit card" : null}</div>
 					</>
 				) : null}
 				<Grid container direction="row" justify="space-around" alignItems="center" style={{ margin: "20px 0" }}>

@@ -30,6 +30,7 @@ const productSchema = new Schema({
 
 productSchema.plugin(mongooseHidden);
 productSchema.plugin(mongoosePaginate);
+productSchema.index({ name: "text" });
 
 module.exports = {
 	model: mongoose.model("Product", productSchema),

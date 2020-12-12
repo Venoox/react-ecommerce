@@ -12,10 +12,11 @@ const cartRouter = require("./routes/cart");
 const couponRouter = require("./routes/coupon");
 const ratingRouter = require("./routes/rating");
 const orderRouter = require("./routes/order");
+const resetRouter = require("./routes/reset");
 
 const app = express();
 
-const whitelist = ["http://172.30.1.59:3000", "http://localhost:3000", "http://localhost:5000"];
+const whitelist = ["http://localhost:3000"];
 const options = {
 	origin: whitelist,
 };
@@ -30,7 +31,7 @@ app.use(helmet());
 app.use(
 	helmet.contentSecurityPolicy({
 		directives: {
-			defaultSrc: ["'self'"],
+			defaultSrc: ["'self'", "stripe.com"],
 		},
 	})
 );
@@ -42,6 +43,7 @@ app.use("/cart", cartRouter);
 app.use("/coupon", couponRouter);
 app.use("/rating", ratingRouter);
 app.use("/order", orderRouter);
+app.use("/reset", resetRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

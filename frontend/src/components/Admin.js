@@ -7,6 +7,8 @@ import AddProduct from "./AddProduct";
 import AddCoupon from "./AddCoupon";
 import ListItemLink from "./ListItemLink";
 import AddOrder from "./AddOrder";
+import AddUser from "./AddUser";
+import AdminHome from "./AdminHome";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -28,7 +30,7 @@ const Admin = () => {
 			<Grid container direction="row" justify="flex-start" alignItems="flex-start">
 				<Paper className={classes.paper}>
 					<List component="nav">
-						<ListItemLink primary="Home" to="/admin" />
+						<ListItemLink primary="General" to="/admin" />
 						<ListItemLink primary="Products" to="/admin/products" />
 						<ListItemLink primary="Orders" to="/admin/orders" />
 						<ListItemLink primary="Users" to="/admin/users" />
@@ -39,7 +41,9 @@ const Admin = () => {
 					<Route path="/admin/products">
 						<AddProduct />
 					</Route>
-					<Route path="/admin/users"></Route>
+					<Route path="/admin/users">
+						<AddUser />
+					</Route>
 					<Route path="/admin/coupons">
 						<AddCoupon />
 					</Route>
@@ -47,7 +51,7 @@ const Admin = () => {
 						<AddOrder />
 					</Route>
 					<Route path="/admin">
-						<div>Email: {}</div>
+						<AdminHome />
 					</Route>
 				</Switch>
 			</Grid>
