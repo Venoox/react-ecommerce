@@ -33,15 +33,20 @@ const useStyles = makeStyles((theme) => ({
 
 const Cart = () => {
 	const { cart, setCart } = useContext(CartContext);
+	const { state } = useContext(AuthContext);
 	const classes = useStyles();
 	const history = useHistory();
 
 	useEffect(() => {
-		backend.get("/cart").then((response) => {
-			if (response.status === 200 && response.statusText === "OK") {
-				setCart(response.data);
-			}
-		});
+		if (state.isAuth) {
+			backend.get("/cart").then((response) => {
+				if (response.status === 200 && response.statusText === "OK") {
+					setCart(response.data);
+				}
+			});
+		} else {
+			setCart(JSON.parse(localStorage.getItem("cart")));
+		}
 	}, []);
 
 	const subtotal = () => {

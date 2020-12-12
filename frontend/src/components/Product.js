@@ -68,7 +68,7 @@ const Product = () => {
 		if (state.isAuth) {
 			backend
 				.post("/cart/add", {
-					productId,
+					productId: product._id,
 					quantity,
 				})
 				.then((response) => {
@@ -80,10 +80,7 @@ const Product = () => {
 			let cart = localStorage.getItem("cart");
 			if (cart === null) cart = [];
 			else cart = JSON.parse(cart);
-			cart.push({
-				productId: product._id,
-				quantity,
-			});
+			cart.push({ ...product, quantity });
 			localStorage.setItem("cart", JSON.stringify(cart));
 		}
 	};
@@ -100,6 +97,7 @@ const Product = () => {
 				.then((response) => {
 					if (response.status === 200 && response.statusText === "OK") {
 						NotificationManager.success("Comment added", "Success", 3000);
+						setRatings((ratings) => ratings.concat(response.data));
 					} else {
 						NotificationManager.error("Failed to add comment", "Error", 3000);
 					}
@@ -120,15 +118,13 @@ const Product = () => {
 					<Grid item>
 						<img src={process.env.REACT_APP_API + product.image} alt="" width={256} height={256}></img>
 					</Grid>
-					<Grid item direction="column" justify="center" alignItems="center" className={classes.product}>
-						<Grid item style={{ alignSelf: "flex-start" }}>
-							{product.name}
-						</Grid>
-						<Grid item>Price: {Number(product.price).toFixed(2)} €</Grid>
+					<Grid item className={classes.product}>
+						<Typography style={{ alignSelf: "flex-start", fontSize: "1.2rem", fontWeight: "bold" }}>{product.name}</Typography>
+						<Typography>Price: {Number(product.price).toFixed(2)} €</Typography>
 						<Grid item>
 							Quantity: <Input type="number" inputProps={{ min: 1 }} value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ width: 50 }} />
 						</Grid>
-						<Button variant="contained" color="primary" onClick={() => addToCart(quantity)}>
+						<Button variant="contained" color="secondary" onClick={() => addToCart(quantity)}>
 							Add to cart
 						</Button>
 					</Grid>
@@ -158,18 +154,18 @@ const Product = () => {
 						</Grid>
 						<Grid item style={{ margin: 5 }}>
 							<Button disabled={disabled} variant="contained" color="primary" component="span" onClick={() => addComment()}>
-								{disabled ? <CircularProgress size={20}></CircularProgress> : "Add comment"}
+								{disabled ? <CircularProgress size={20}></CircularProgress> : "Add rating"}
 							</Button>
 						</Grid>
 					</Grid>
 				) : (
-					<div>You need to be logged in to comment!</div>
+					<div>You need to be logged in to rate the product!</div>
 				)}
 				{ratings.length === 0 ? (
-					<Typography variant="h6">No comments</Typography>
+					<Typography variant="h6">No ratings</Typography>
 				) : (
 					<Typography variant="h6" style={{ textAlign: "left" }}>
-						Comments ({ratings.length})
+						Ratings ({ratings.length})
 					</Typography>
 				)}
 				<Grid container direction="column" alignItems="center">

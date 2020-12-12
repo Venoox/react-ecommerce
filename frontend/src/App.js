@@ -12,19 +12,22 @@ import Register from "./components/Register";
 import NavBar from "./components/NavBar";
 import Products from "./components/Products";
 import Product from "./components/Product";
+import Footer from "./components/Footer";
+import Cart from "./components/Cart";
+import Checkout from "./components/Checkout";
+import Dashboard from "./components/Dashboard";
+import Confirm from "./components/Confirm";
 
 import Grid from "@material-ui/core/Grid";
-import Cart from "./components/Cart";
 
 import { backend } from "./gateway";
-import Checkout from "./components/Checkout";
 
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import Dashboard from "./components/Dashboard";
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import Reset from "./components/Reset";
 const stripePromise = loadStripe("pk_test_FwNdOZHOf7ZqsBYrrLpwgcmX00zSThiPJG");
 
 export const AuthContext = React.createContext();
@@ -90,13 +93,13 @@ const App = () => {
 				<MuiPickersUtilsProvider utils={DateFnsUtils}>
 					<AuthContext.Provider value={{ state, dispatch }}>
 						<CartContext.Provider value={{ cart, setCart }}>
-							<Grid container direction="column">
+							<Grid container direction="column" style={{ minHeight: "100vh" }}>
 								<NavBar />
 								<Switch>
 									<Route path="/login">
 										<Login />
 									</Route>
-									<Route path="/products">
+									<Route path={["/products/:search", "/products"]}>
 										<Products />
 									</Route>
 									<Route path="/product/:productId">
@@ -117,6 +120,12 @@ const App = () => {
 									<Route path="/dashboard">
 										<Dashboard />
 									</Route>
+									<Route path="/confirm/:id/:token">
+										<Confirm />
+									</Route>
+									<Route path={["/reset/:email/:token", "/reset"]}>
+										<Reset />
+									</Route>
 									<Route path="/">
 										<Home />
 									</Route>
@@ -124,6 +133,7 @@ const App = () => {
 
 								<NotificationContainer />
 							</Grid>
+							<Footer />
 						</CartContext.Provider>
 					</AuthContext.Provider>
 				</MuiPickersUtilsProvider>

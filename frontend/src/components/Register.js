@@ -7,7 +7,7 @@ import { AuthContext } from "../App";
 import { makeStyles } from "@material-ui/core/styles";
 import { CircularProgress, Typography, Button, TextField, Grid, Paper } from "@material-ui/core";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 	},
@@ -34,20 +34,19 @@ const Register = () => {
 	const [password, setPassword] = useState("");
 	const [repeatPassword, setRepeatPassword] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [sent, setSent] = useState(false);
 
-	const signUp = e => {
+	const signUp = (e) => {
 		e.preventDefault();
 		setLoading(true);
 		if (password === repeatPassword) {
-			backend.post("/user/register", { email, password }).then(response => {
+			backend.post("/user/register", { email, password }).then((response) => {
 				if (response.status === 200 && response.statusText === "OK") {
-					console.log(response.data);
 					setLoading(false);
-					history.push("/login");
+					setSent(true);
 				} else {
 					NotificationManager.error("Registration failed", "Error", 3000);
 					setLoading(false);
-					console.log(response.data);
 				}
 			});
 		}
@@ -61,13 +60,14 @@ const Register = () => {
 						Sign Up
 					</Typography>
 
-					<TextField disabled={loading} id="outlined-basic" label="E-mail" variant="outlined" onChange={e => setEmail(e.target.value)} />
-					<TextField disabled={loading} id="outlined-basic" label="Password" variant="outlined" type="password" onChange={e => setPassword(e.target.value)} />
-					<TextField disabled={loading} id="outlined-basic" label="Repeat password" variant="outlined" type="password" onChange={e => setRepeatPassword(e.target.value)} />
+					<TextField disabled={loading} id="outlined-basic" label="E-mail" variant="outlined" onChange={(e) => setEmail(e.target.value)} />
+					<TextField disabled={loading} id="outlined-basic" label="Password" variant="outlined" type="password" onChange={(e) => setPassword(e.target.value)} />
+					<TextField disabled={loading} id="outlined-basic" label="Repeat password" variant="outlined" type="password" onChange={(e) => setRepeatPassword(e.target.value)} />
 
 					<Button disabled={loading} variant="contained" color="primary" onClick={signUp}>
 						{loading ? <CircularProgress size={20}></CircularProgress> : "Register"}
 					</Button>
+					{sent ? <Typography>Confirmation code sent to e-mail!</Typography> : null}
 				</div>
 			</Paper>
 		</Grid>

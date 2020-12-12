@@ -79,14 +79,14 @@ router.put("/addpayment", auth(["admin", "user"]), async (req, res) => {
 		if (!result) return res.status(404).send("Order not saved");
 		if (payment === "creditcard") {
 			let amount = 0;
-			order.products.forEach(element => {
+			order.products.forEach((element) => {
 				amount += element.price * element.quantity;
 			});
 			const paymentIntent = await stripe.paymentIntents.create({
 				amount: amount * 100,
-				currency: "usd",
+				currency: "eur",
 				// Verify your integration in this guide by including this parameter
-				metadata: { integration_check: "accept_a_payment" }
+				metadata: { integration_check: "accept_a_payment" },
 			});
 			console.log(paymentIntent);
 			return res.send({ client_secret: paymentIntent.client_secret });

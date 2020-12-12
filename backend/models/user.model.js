@@ -17,6 +17,15 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	status: {
+		type: Number,
+		required: true,
+		default: 0,
+	},
+	confirmation_token: {
+		type: String,
+		required: false,
+	},
 	firstName: {
 		type: String,
 		required: false,
@@ -62,7 +71,9 @@ const userValidationSchema = Joi.object({
 		.email({ minDomainSegments: 2 })
 		.required(),
 
-	password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+	password: Joi.string()
+		.pattern(new RegExp("^[a-zA-Z0-9]{6,50}$"))
+		.required(),
 });
 
 module.exports = {

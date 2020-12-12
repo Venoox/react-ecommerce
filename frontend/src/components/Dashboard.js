@@ -30,6 +30,7 @@ const Dashboard = () => {
 				<Paper className={classes.paper}>
 					<List component="nav" aria-label="secondary mailbox folders">
 						<ListItemLink primary="Account" to="/dashboard" />
+						<ListItemLink primary="Addresses" to="/dashboard/address" />
 						<ListItemLink primary="Orders" to="/dashboard/orders" />
 					</List>
 				</Paper>

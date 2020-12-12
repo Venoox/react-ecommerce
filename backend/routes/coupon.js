@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 	try {
 		const coupon = await Coupon.model.create({ couponCode, discount, expireDate });
 		if (coupon) {
-			res.send("Coupon created");
+			res.send({ _id: coupon._id });
 		} else {
 			throw Error("Error creating coupon!");
 		}

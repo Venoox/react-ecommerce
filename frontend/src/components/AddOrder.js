@@ -7,7 +7,6 @@ import { NotificationManager } from "react-notifications";
 import { Input, Button, makeStyles, ExpansionPanel, ExpansionPanelSummary, Typography, ExpansionPanelDetails, IconButton, CircularProgress } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { KeyboardDatePicker } from "@material-ui/pickers";
 import MaterialTable from "material-table";
 import format from "date-fns/format";
 
@@ -31,78 +30,62 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const AddCoupon = () => {
+const AddOrder = () => {
 	const classes = useStyles();
-
-	const [coupons, setCoupons] = useState({
+	const [orders, setOrders] = useState({
 		columns: [
 			{ title: "ID", field: "_id", editable: "never" },
-			{ title: "Code", field: "couponCode" },
-			{ title: "Discount", field: "discount", type: "numeric", render: (rowData) => <>{rowData.discount}%</> },
+			{ title: "First name", field: "address.firstName", editable: "never" },
+			{ title: "Last name", field: "address.lastName", editable: "never" },
 			{
-				title: "Expire date",
-				field: "expireDate",
-				initialEditValue: Date.now,
-				type: "date",
+				title: "Payment method",
+				field: "payment",
+				editable: "never",
+				lookup: {
+					creditcard: "Credit Card",
+					upn: "UPN",
+					delivery: "Pay on delivery",
+				},
 			},
+			{
+				title: "Status",
+				field: "status",
+				lookup: {
+					created: "Created",
+					waiting: "Waiting for payment",
+					processing: "Processing",
+					shipped: "Shipped",
+					delivered: "Delivered",
+				},
+			},
+			{ title: "Date", field: "createdAt", editable: "never", render: (rowData) => <>{format(new Date(rowData.createdAt), "dd.MM.yyyy HH:mm")}</> },
 		],
 		data: [],
 	});
 
 	useEffect(() => {
-		backend.get("/coupon").then((response) => {
+		backend.get("/order").then((response) => {
 			if (response.status === 200 && response.statusText === "OK") {
-				setCoupons({ ...coupons, data: response.data });
+				setOrders({ ...orders, data: response.data });
 			}
 		});
 	}, []);
 
-	const addCoupon = (newData) => {
-		if (newData.couponCode !== "" && newData.discount !== 0) {
-			return backend
-				.post("/coupon", {
-					couponCode: newData.couponCode,
-					discount: newData.discount,
-					expireDate: newData.expireDate,
-				})
-				.then((response) => {
-					if (response.status === 200 && response.statusText === "OK") {
-						NotificationManager.success("Added new coupon", "Success", 3000);
-						setCoupons((prevState) => {
-							const data = [...prevState.data];
-							newData._id = response.data._id;
-							data.push(newData);
-							return { ...prevState, data };
-						});
-					} else {
-						NotificationManager.error("Failed to add new coupon", "Error", 3000);
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-					NotificationManager.error("Network error", "Error", 3000);
-				});
-		}
-	};
-
-	const updateCoupon = (newData, oldData) => {
+	const updateOrder = (newData, oldData) => {
 		return backend
-			.put("/coupon", {
-				couponId: newData._id,
-				couponCode: newData.couponCode,
-				discount: newData.discount,
-				expireDate: newData.expireDate,
+			.put("/order/status", {
+				orderId: newData._id,
+				status: newData.status,
 			})
 			.then((response) => {
 				if (response.status === 200 && response.statusText === "OK") {
-					NotificationManager.success("Updated coupon", "Success", 3000);
-					setCoupons((prevState) => {
+					setOrders((prevState) => {
 						const data = [...prevState.data];
 						data[data.indexOf(oldData)] = newData;
 						return { ...prevState, data };
 					});
 				} else {
-					NotificationManager.error("Failed to update coupon", "Error", 3000);
+					NotificationManager.error("Failed to edit", "Error", 3000);
 				}
 			})
 			.catch((err) => {
@@ -111,13 +94,12 @@ const AddCoupon = () => {
 			});
 	};
 
-	const deleteCoupon = (oldData) => {
+	const deleteOrder = (oldData) => {
 		return backend
-			.delete("/coupon/" + oldData._id)
+			.delete("/order/" + oldData._id)
 			.then((response) => {
 				if (response.status === 200 && response.statusText === "OK") {
-					NotificationManager.success("Removed coupon", "Success", 3000);
-					setCoupons((prevState) => {
+					setOrders((prevState) => {
 						const data = [...prevState.data];
 						data.splice(data.indexOf(oldData), 1);
 						return { ...prevState, data };
@@ -135,20 +117,20 @@ const AddCoupon = () => {
 	return (
 		<div className={classes.root}>
 			<MaterialTable
-				title="Coupons"
-				columns={coupons.columns}
-				data={coupons.data}
+				title="Orders"
+				columns={orders.columns}
+				data={orders.data}
 				editable={{
-					onRowUpdate: updateCoupon,
-					onRowDelete: deleteCoupon,
-					onRowAdd: addCoupon,
+					onRowUpdate: updateOrder,
+					onRowDelete: deleteOrder,
 				}}
 				options={{
 					grouping: true,
 				}}
+				detailPanel={(rowData) => <></>}
 			/>
 		</div>
 	);
 };
 
-export default AddCoupon;
+export default AddOrder;
